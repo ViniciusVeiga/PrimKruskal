@@ -190,24 +190,74 @@ namespace ProjetoGrafos.DataStructure
             return Kruskal(this.nodes[index].Name);
         }
 
+        #region Prim
+
         public Graph Prim(string name)
         {
             Graph gTree = new Graph();
-            Node node = new Node();
 
-            gTree.AddNode(node.Name);
+            gTree.AddNode(Find(name).Name);
 
             do
             {
-                foreach (Node n in nodes)
+                for (int i = 0; i < gTree.nodes.Count; i++)
                 {
-                    Edge eCost;
-                    List<Edge> nList = n.Edges.OrderBy(x => x.Cost).ToList();
+                    Node node = Find(gTree.nodes[i].Name);
+                    foreach (Edge e in node.Edges)
+                    {
+                        if (e.To.Visited != true)
+                        {
+                            e.To.Visited = true;
+                            if (gTree.Find(e.To.Name) != null)
+                            {
+                                gTree.AddNode(e.To.Name);
+                                AddEdge(gTree.nodes[i], e, gTree);
+                            }
+
+                        }
+                    }
                 }
+
             } while (gTree.nodes.Count != nodes.Count);
+
+            return gTree;
+        }
+
+        private void AddEdge(Node nFrom, Edge eTo, Graph gTree)
+        {
+            Node nTo = gTree.Find(eTo.To.Name);
+            Edge eHelp = GetEdge(nTo, gTree);
+
+            if (eHelp == null)
+            {
+                gTree.Find(nFrom.Name).AddEdge(nTo, eTo.Cost);
+            }
+            else
+            {
+                if (eHelp.Cost > eTo.Cost)
+                {
+                    gTree.Find(nFrom.Name).AddEdge(nTo, eTo.Cost);
+                }
+            }
+        }
+
+        private Edge GetEdge(Node nTo, Graph gTree)
+        {
+            foreach (var n in gTree.nodes)
+            {
+                foreach (var e in n.Edges)
+                {
+                    if (e.To.Name == nTo.Name)
+                    {
+                        return e;
+                    }
+                }
+            }
 
             return null;
         }
+
+        #endregion
 
         #region Kruskal
 
@@ -215,7 +265,6 @@ namespace ProjetoGrafos.DataStructure
         {
             Graph gTree = new Graph();
             List<Edge> eList = new List<Edge>();
-            Node node = Find(name);
 
             foreach (Node n in nodes)
             {
