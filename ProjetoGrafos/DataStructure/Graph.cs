@@ -209,6 +209,8 @@ namespace ProjetoGrafos.DataStructure
             return null;
         }
 
+        #region Kruskal
+
         public Graph Kruskal(string name)
         {
             Graph gTree = new Graph();
@@ -218,37 +220,39 @@ namespace ProjetoGrafos.DataStructure
             foreach (Node n in nodes)
             {
                 gTree.AddNode(n.Name, n.Info);
-                eList.AddRange(n.Edges);      
+                eList.AddRange(n.Edges);
             }
 
             eList = eList.OrderBy(c => c.Cost).ToList();
 
             foreach (Edge e in eList)
             {
-                Node nFrom = gTree.Find(e.From.Name);
-                Node nTo = gTree.Find(e.To.Name);
-
-                if (!ExistEdge(nFrom, nTo))
+                if (!ExistEdge(gTree.Find(e.To.Name), gTree))
                 {
-                    nFrom.AddEdge(e.To, e.Cost);
+                    gTree.Find(e.From.Name).AddEdge(e.To, e.Cost);
                 }
             }
 
             return gTree;
         }
-        
-        private bool ExistEdge(Node nFrom, Node nTo)
+
+        private bool ExistEdge(Node nTo, Graph gTree)
         {
-            foreach (Edge e in nFrom.Edges)
+            foreach (var n in gTree.nodes)
             {
-                if (e.To.Name == nTo.Name)
+                foreach (var e in n.Edges)
                 {
-                    return true;
+                    if (e.To.Name == nTo.Name)
+                    {
+                        return true;
+                    }
                 }
             }
 
             return false;
         }
+
+        #endregion
 
         #endregion
 
